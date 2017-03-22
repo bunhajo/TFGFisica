@@ -1,13 +1,13 @@
 ---
-title: "TFG"
+title: "Primeros Resultados PDM"
 author: "Juan Tornero"
-date: "12 de marzo de 2017"
+date: "14 de marzo de 2017"
 header-include:
   - \usepackage{bbm}
 output: pdf_document
 ---
 
-Disposicion inicial datos
+Tenemos la disposición inicial de puntos:
 
 ```{r, echo = FALSE, fig.height=4, fig.width=8}
 library(ggplot2)
@@ -28,72 +28,39 @@ ggplot(df, aes(x=time, y=10^12*data, ymin=10^12*(data-error), ymax=10^12*(data+e
 
 ```
 
-Cálculo del Estadístico $\theta=\frac{s^2}{\sigma^2}$ para $N_b=10$ y $N_c=\{1,2,3\}$:
+Tras implementar un pequeño añgoritmo para el cálculo del estadístico $\theta=\frac{s^2}{\sigma^2}$, hemos hecho pruebas para periodos de 1 a 5 días, en intervalos de 0.001 días. Hemos hecho este cálculo repetidamente para $(N_b,N_c)=\{(50,1), (25,2), (10,10), (10,1),(5,5) \}$, donde $N_b$ es el número de divisiones del intervalo de fase $(0,1)$, y $N_c$ el número diferente de recubrientos dado $N_b$:
 
 ```{r, echo=FALSE,  fig.height=4, fig.width=8}
 
-t1=min(df$time)
-df$time=df$time-t1
-df$time=df$time*86400
+full_results=readRDS("Results.rds")
 
-samples_stat=function(df, P=3.9, N_b=10, N_c=1){
-  
-  Per=86400*P
-  phi=(df$time)/Per-trunc((df$time)/Per)
-  aux=data.frame(time=phi, data=df$data)
-  s=double()
-  n=double()
-  j=0
-  for (i in 0:(N_c-1)){
-    adj=i/(N_c*N_b)
-    for(i in seq(adj,0.9+adj,1/N_b)){
-      j=j+1
-      s[j]=var(aux$data[which(aux$time >= i & aux$time < i+1/N_b)])
-      n[j]=length(which(aux$time >= i & aux$time < i+1/N_b))
-    }
-  }  
-  s_sample=sum((n-1)*s, na.rm = T)/(sum(n, na.rm = T)-N_b*N_c)
-  
-  return(s_sample^2/var(df$data)^2)
-  
-}
-#Statistic Calculation
-result=double()
-periods_prova=seq(3,5,0.001)
-j=0
-for(N_c in 1:3)
-for(i in periods_prova){
-  j=j+1
-  result[j]= samples_stat(df, P=i,N_c = N_c)
-}
 
-stat_results=data.frame(period=rep(periods_prova,3), theta=result, N_c=c(rep(1,length(periods_prova)),rep(2,length(periods_prova)),rep(3,length(periods_prova))))
-
-ggplot(stat_results, aes(x=period, y=theta, colour=N_c))+
+# Plot Stat
+ggplot(full_results, aes(x=period, y=theta, colour=factor(n_result)))+
   geom_line()+
 #  annotate("text", x=c(minim_period, 1.5*minim_period), y=c(0,0), label=c("Period", "Period and half"))+
   ylab(expression(theta))+
-  scale_color_gradient(high = "red", low="blue", guide = FALSE)
+  scale_color_discrete(guide=FALSE)+
+  geom_segment(aes(x=3.8, xend=4, y=0.1, yend=0.1),colour="red")+
+  geom_segment(aes(x=3.8, xend=4, y=0.85, yend=0.85),colour="red")+
+  geom_segment(aes(x=3.8, xend=3.8, y=0.1, yend=0.85),colour="red")+
+  geom_segment(aes(x=4, xend=4, y=0.1, yend=0.85),colour="red")
 
 ```
 
-De los tres mínimos del estadístico obtenemos la estimación del periodo de rotación de $\mu=3.909667  \pm 0.003055$ días, lo que concuerda con el valor conocido de 3.9063 días. Esta es la representación poniendo en fase los datos para ese período:
+De los cinco mínimos del estadístico obtenemos la estimación del periodo de rotación $\mu=3.9094  \pm 0.0035$ días, lo que concuerda con el valor conocido de 3.9063 días. Destacar que en el caso (50,1) y (25,25), que son además los de mayor significancia estadística, el periodo obtenido es 3.906 en ambos casos. Esta es la representación poniendo en fase los datos para el periodo $\mu = 3.9094$:
 
 ```{r, echo=FALSE, fig.height=4, fig.width=8}
 
-#Best period 
-Per=86400*3.909667
-phi=(df$time)/Per-trunc((df$time)/Per)
-b_per=data.frame(time=phi, data=df$data, error=df$error)
+b_per=readRDS("best_period.rds")
 
 #Plot Best Period
-ggplot(b_per, aes(x=100*time, y=data/mean(data), ymin=(data-error)/mean(data), ymax=(data+error)/mean(data)))+
+ggplot(b_per, aes(x=time, y=data/mean(data), ymin=(data-error)/mean(data), ymax=(data+error)/mean(data)))+
   geom_point()+
   geom_smooth(se=var(b_per$data))+
   geom_errorbar()+
   xlab("Phase")+
   ylab(expression(paste(Delta,"F > 1 TeV [", 10^{-12},"ph. ", cm^{-2}, s^{-1},"]")))
-
 
 
 

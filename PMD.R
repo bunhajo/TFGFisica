@@ -80,7 +80,7 @@ df$time=df$time*86400
 
 
 #Statistic Definition
-samples_stat=function(df, P=3.9, N_b=10, N_c=1){
+samples_stat=function(df, P=3.9, N_b=5, N_c=5){
   
   Per=86400*P
   phi=(df$time)/Per-trunc((df$time)/Per)
@@ -88,50 +88,82 @@ samples_stat=function(df, P=3.9, N_b=10, N_c=1){
   s=double()
   n=double()
   j=0
-  for (i in 0:(N_c-1)){
-    adj=i/(N_c*N_b)
-    for(i in seq(adj,0.9+adj,1/N_b)){
-      j=j+1
-      s[j]=var(aux$data[which(aux$time >= i & aux$time < i+1/N_b)])
-      n[j]=length(which(aux$time >= i & aux$time < i+1/N_b))
+  for (k in 0:(N_c-1)){
+    adj= k/(N_c*N_b)
+    for(i in seq(-adj,1,1/N_b)){
+      points=which(aux$time >= i & aux$time < i+1/N_b)
+      if(length(points)>0){
+        j=j+1
+        s[j]=sum((aux$data[points]-mean(aux$data[points]))^2)/(length(points)-1)
+        n[j]=length(points)
+        n=n[which(!is.na(s))]
+        s=s[which(!is.na(s))]
+      }
     }
   }  
   s_sample=sum((n-1)*s, na.rm = T)/(sum(n, na.rm = T)-N_b*N_c)
+  var_data=sum((aux$data-mean(aux$data))^2)/(nrow(aux)-1)
   
-  return(s_sample^2/var(df$data)^2)
-  
+  return(s_sample/var_data)
 }
 #Statistic Calculation
 result=double()
 periods_prova=seq(3,5,0.001)
 j=0
-for(N_c in 1:3)
+# for(N_c in 1:3)
 for(i in periods_prova){
   j=j+1
-  result[j]= samples_stat(df, P=i,N_c = N_c)
+  result[j]= samples_stat(df, P=i,N_b=25, N_c = 2)
 }
 
-
 #Statistic Results
-stat_results=data.frame(period=rep(periods_prova,3), theta=result, N_c=c(rep(1,length(periods_prova)),rep(2,length(periods_prova)),rep(3,length(periods_prova))))
-minim_period[1]=stat_results$period[which(stat_results$theta==min(na.omit(stat_results$theta[which(stat_results$N_c==1)])))]
-minim_period[2]=stat_results$period[which(stat_results$theta==min(na.omit(stat_results$theta[which(stat_results$N_c==2)])))]
-minim_period[3]=stat_results$period[which(stat_results$theta==min(na.omit(stat_results$theta[which(stat_results$N_c==3)])))]
+stat_results=data.frame(period=periods_prova, theta=result)
+minim_theta=min(na.omit(stat_results$theta))
+minim_period=stat_results$period[which(stat_results$theta==minim_theta)]
 
-minim_stat=min(na.omit(stat_results$theta))
 
-#Best period 
-Per=86400*minim_period[1]
+
+### Results
+copy_10.1 
+copy_10.10  
+copy_5.5 
+copy_50.1 # Exact Period  
+copy_25.2 = stat_results # Exact Period
+
+full_results = full_join(copy_10.1, full_join(copy_10.10, full_join(copy_5.5, full_join(copy_25.2, copy_50.1))))
+full_results$n_result=rownames(full_results)
+full_results$n_result=as.double(trunc(as.double(full_results$n_result)/(length(periods_prova)+1)))
+minim_periods=full_results %>% group_by(n_result) %>% summarise(minim_period= period[which(theta==min(theta))])
+minim_theta=full_results %>% group_by(n_result) %>% summarise(minim_theta= min(theta))
+saveRDS(full_results, "Results.rds")
+
+
+#Period Determination
+
+
+results=readRDS("Results.rds")
+
+b_period = mean(minim_periods$minim_period)
+sqrt(var(minim_periods$minim_period))
+
+Per=86400*b_period
+#Per=86400*3.9063
 phi=(df$time)/Per-trunc((df$time)/Per)
 b_per=data.frame(time=phi, data=df$data, error=df$error)
+saveRDS(b_per, "best_period.rds")
 #### Plots ####
 
 # Plot Stat
-ggplot(stat_results, aes(x=period, y=theta, colour=N_c))+
+ggplot(full_results, aes(x=period, y=theta, colour=factor(n_result)))+
   geom_line()+
 #  annotate("text", x=c(minim_period, 1.5*minim_period), y=c(0,0), label=c("Period", "Period and half"))+
-  ylab(expression(theta))+
-  scale_color_gradient(high = "red", low="blue", guide = FALSE)
+  ylab(expression(theta))+scale_color_discrete(h=c(90,270))+
+  geom_segment(aes(x=3.8, xend=4, y=0.1, yend=0.1),colour="red")+
+  geom_segment(aes(x=3.8, xend=4, y=0.85, yend=0.85),colour="red")+
+  geom_segment(aes(x=3.8, xend=3.8, y=0.1, yend=0.85),colour="red")+
+  geom_segment(aes(x=4, xend=4, y=0.1, yend=0.85),colour="red")
+  #xlim(c(3.9,3.92))+
+  #scale_color_discrete(high = "green", low="blue")
   
 #Plot Best Period
 ggplot(b_per, aes(x=100*time, y=data/mean(data), ymin=(data-error)/mean(data), ymax=(data+error)/mean(data)))+
