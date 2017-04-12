@@ -9,8 +9,30 @@ output: pdf_document
 
 Tenemos la disposición inicial de puntos:
 
-```{r, echo = FALSE, fig.height=4, fig.width=8}
+```{r, echo = FALSE, fig.height=4, fig.width=8,message=FALSE}
 library(ggplot2)
+library(dplyr)
+multiplot <- function(..., plotlist=NULL, cols) {
+  require(grid)
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  numPlots = length(plots)
+  # Make the panel
+  plotCols = cols                          # Number of columns of plots
+  plotRows = ceiling(numPlots/plotCols) # Number of rows needed, calculated from # of cols
+  # Set up the page
+  grid.newpage()
+  pushViewport(viewport(layout = grid.layout(plotRows, plotCols)))
+  vplayout <- function(x, y)
+    viewport(layout.pos.row = x, layout.pos.col = y)
+  # Make each plot, in the correct location
+  for (i in 1:numPlots) {
+    curRow = ceiling(i/plotCols)
+    curCol = (i-1) %% plotCols + 1
+    print(plots[[i]], vp = vplayout(curRow, curCol ))
+  }
+}
+
 
 df=read.delim("C:/Users/Tornero/Documents/Uni/TFGFisica/HESS_LS5039.dat", header = FALSE, sep= "")
 names(df)=c("time", "data", "error")
@@ -28,29 +50,75 @@ ggplot(df, aes(x=time, y=10^12*data, ymin=10^12*(data-error), ymax=10^12*(data+e
 
 ```
 
-Tras implementar un pequeño añgoritmo para el cálculo del estadístico $\theta=\frac{s^2}{\sigma^2}$, hemos hecho pruebas para periodos de 1 a 5 días, en intervalos de 0.001 días. Hemos hecho este cálculo repetidamente para $(N_b,N_c)=\{(50,1), (25,2), (10,10), (10,1),(5,5) \}$, donde $N_b$ es el número de divisiones del intervalo de fase $(0,1)$, y $N_c$ el número diferente de recubrientos dado $N_b$:
+Cálculo por Lomb-Scargle
 
-```{r, echo=FALSE,  fig.height=4, fig.width=8}
+```{r, echo=FALSE, fig.width=8, fig.height=3, message=FALSE}
+lomb=readRDS("Lomb-Scargle.RDS")
+#### Style ####
+style = theme(#panel.grid.major = element_blank(),
+                    #panel.grid.minor = element_blank(),
+                    panel.background = element_blank(),
+                    axis.title.x = element_text(size = 13,
+                                                hjust=1),
+                    axis.title.y = element_text(size = 13,
+                                                vjust=1.5),
+                    axis.text.x = element_text(size= 8,
+                                               angle = 0,
+                                               face = 'bold',
+                                               vjust = 1,
+                                               hjust=0.5),
+                    axis.text.y = element_text(size= 8,
+                                               face = 'bold',
+                                               vjust = 0.5,
+                                               hjust=1),
+                    plot.title = element_text(hjust = 0),
+                    legend.text = element_text(size=15)) +
+  theme(plot.title = element_text(size=50)
+  )  
 
-full_results=readRDS("Results.rds")
+####.####
+l_plot=data.frame(Freq=lomb$scanned, Power=lomb$power)
+
+ggplot(l_plot, aes(x=Freq, y=Power))+geom_line()+
+  xlab(expression(paste("Frequency [", day^{-1}, "]")))+
+  ylab(expression(paste("-log"[10], "(Probability)")))+
+  scale_x_continuous(breaks=c(seq(0,0.6,0.05)),labels=abbreviate)+
+  style
 
 
-# Plot Stat
-ggplot(full_results, aes(x=period, y=theta, colour=factor(n_result)))+
-  geom_line()+
-#  annotate("text", x=c(minim_period, 1.5*minim_period), y=c(0,0), label=c("Period", "Period and half"))+
-  ylab(expression(theta))+
-  scale_color_discrete(guide=FALSE)+
-  geom_segment(aes(x=3.8, xend=4, y=0.1, yend=0.1),colour="red")+
-  geom_segment(aes(x=3.8, xend=4, y=0.85, yend=0.85),colour="red")+
-  geom_segment(aes(x=3.8, xend=3.8, y=0.1, yend=0.85),colour="red")+
-  geom_segment(aes(x=4, xend=4, y=0.1, yend=0.85),colour="red")
 
 ```
 
-De los cinco mínimos del estadístico obtenemos la estimación del periodo de rotación $\mu=3.9094  \pm 0.0035$ días, lo que concuerda con el valor conocido de 3.9063 días. Destacar que en el caso (50,1) y (25,25), que son además los de mayor significancia estadística, el periodo obtenido es 3.906 en ambos casos. Esta es la representación poniendo en fase los datos para el periodo $\mu = 3.9094$:
+Tras implementar un pequeño añgoritmo para el cálculo del estadístico $\theta=\frac{s^2}{\sigma^2}$, hemos hecho pruebas para periodos de 1 a 5 días, en intervalos de 0.001 días. Hemos hecho este cálculo repetidamente para $(N_b,N_c)=\{(50,1), (25,2), (10,10), (10,1),(5,5) \}$, donde $N_b$ es el número de divisiones del intervalo de fase $(0,1)$, y $N_c$ el número diferente de recubrientos dado $N_b$:
 
-```{r, echo=FALSE, fig.height=4, fig.width=8}
+```{r, echo=FALSE,  fig.height=4, fig.width=8, message=FALSE}
+
+
+result=readRDS("Results.rds")
+minim_periods=result %>% group_by(n_result) %>% summarise(minim_period= period[which(theta==min(theta))])
+p=readRDS("plots_theta.rds")
+multiplot(plotlist = p, cols=2)
+
+```
+
+De los cinco mínimos del estadístico obtenemos la estimación del periodo de rotación $\mu=3.9082  \pm 0.0029$ días, lo que concuerda con el valor conocido de 3.9063 días. Destacar que en el caso (50,1) y (25,25), que son además los de mayor significancia estadística, el periodo obtenido es 3.906 en ambos casos. 
+
+```{r xtable1, results="asis",message=FALSE,echo=FALSE,warning=FALSE}
+parameter = data.frame(N_b=c(5,5,5,10,10,25,50), N_c=c(2,4,5,2,5,2,1))
+
+tab<-data.frame(parameter$N_b, parameter$N_c, minim_periods$minim_period)
+colnames(tab)<-c(expression(N_b),expression(N_c),"Period Stimation")
+
+
+library(xtable)
+options(xtable.caption.placement = 'top',xtable.comment = FALSE)
+tabla_1 <- xtable(tab,caption=c("Results PMD"), label = "",digits=c(0,0,0,3), align = rep("c",4))
+print(tabla_1, type="latex", include.rownames=F)
+```
+
+Esta es la representación poniendo en fase los datos para el periodo $\mu = 3.9082$:
+
+```{r, echo=FALSE, fig.height=4, fig.width=8, message=FALSE}
 
 b_per=readRDS("best_period.rds")
 

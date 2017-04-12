@@ -13,21 +13,21 @@ require(data.tree)
 require(stringr)
 library(RColorBrewer)  
 library(reshape2) 
+library(lomb)
 #### Style ####
-style = theme(panel.grid.major = element_blank(),
-                    panel.grid.minor = element_blank(),
+style = theme(#panel.grid.major = element_blank(),
+                    #panel.grid.minor = element_blank(),
                     panel.background = element_blank(),
-                    axis.line = element_blank(),
-                    axis.title.x = element_text(size = 26,
-                                                vjust=0),
-                    axis.title.y = element_text(size = 26,
+                    axis.title.x = element_text(size = 13,
+                                                hjust=1),
+                    axis.title.y = element_text(size = 13,
                                                 vjust=1.5),
-                    axis.text.x = element_text(size= 16,
-                                               angle = 45,
+                    axis.text.x = element_text(size= 8,
+                                               angle = 0,
                                                face = 'bold',
                                                vjust = 1,
-                                               hjust=1),
-                    axis.text.y = element_text(size= 16,
+                                               hjust=0.5),
+                    axis.text.y = element_text(size= 8,
                                                face = 'bold',
                                                vjust = 0.5,
                                                hjust=1),
@@ -35,7 +35,27 @@ style = theme(panel.grid.major = element_blank(),
                     legend.text = element_text(size=15)) +
   theme(plot.title = element_text(size=50)
   )  
+#### Lomb Scargle ####
+
+#lomb=lsp(df[,1:2], from = 0, to = 0.6,  ofac = 100)
+#saveRDS(lomb, "Lomb-Scargle.rds")
+
+
+lomb=readRDS("Lomb-Scargle.RDS")
+
+l_plot=data.frame(Freq=lomb$scanned, Power=lomb$power)
+
+ggplot(l_plot, aes(x=Freq, y=Power))+geom_line()+
+  xlab(expression(paste("Frequency [", day^{-1}, "]")))+
+  ylab(expression(paste("-log"[10], "(Probability)")))+
+  scale_x_continuous(breaks=c(seq(0,0.6,0.05)),labels=abbreviate)+
+  style
+
+
 #### Computation ####
+
+
+
 
 #Read data
 df=read.delim("C:/Users/Tornero/Documents/Uni/TFGFisica/HESS_LS5039.dat", header = FALSE, sep= "")
@@ -127,13 +147,13 @@ minim_period=stat_results$period[which(stat_results$theta==minim_theta)]
 copy_10.1 
 copy_10.10  
 copy_5.5 
-copy_50.1 # Exact Period  
 copy_25.2 = stat_results # Exact Period
+copy_50.1 # Exact Period  
 
 full_results = full_join(copy_10.1, full_join(copy_10.10, full_join(copy_5.5, full_join(copy_25.2, copy_50.1))))
 full_results$n_result=rownames(full_results)
 full_results$n_result=as.double(trunc(as.double(full_results$n_result)/(length(periods_prova)+1)))
-minim_periods=full_results %>% group_by(n_result) %>% summarise(minim_period= period[which(theta==min(theta))])
+minim_periods=results %>% group_by(n_result) %>% summarise(minim_period= period[which(theta==min(theta))])
 minim_theta=full_results %>% group_by(n_result) %>% summarise(minim_theta= min(theta))
 saveRDS(full_results, "Results.rds")
 
@@ -143,7 +163,8 @@ saveRDS(full_results, "Results.rds")
 
 results=readRDS("Results.rds")
 
-b_period = mean(minim_periods$minim_period)
+#b_period = mean(minim_periods$minim_period)
+b_period=3.9082
 sqrt(var(minim_periods$minim_period))
 
 Per=86400*b_period
@@ -154,17 +175,59 @@ saveRDS(b_per, "best_period.rds")
 #### Plots ####
 
 # Plot Stat
-ggplot(full_results, aes(x=period, y=theta, colour=factor(n_result)))+
+p=ggplot(results[which(results$n_result==0),], aes(x=period, y=theta, colour=factor(n_result)))+
   geom_line()+
+  ggtitle(expression(paste("N",scriptscriptstyle(b),"=10","   N",scriptscriptstyle(c),"=1")))+
 #  annotate("text", x=c(minim_period, 1.5*minim_period), y=c(0,0), label=c("Period", "Period and half"))+
-  ylab(expression(theta))+scale_color_discrete(h=c(90,270))+
-  geom_segment(aes(x=3.8, xend=4, y=0.1, yend=0.1),colour="red")+
+  ylab(expression(theta))+scale_color_discrete(h=c(90,270), guide=FALSE)+
+  geom_segment(aes(x=3.8, xend=4, y=0.4, yend=0.4),colour="red")+
   geom_segment(aes(x=3.8, xend=4, y=0.85, yend=0.85),colour="red")+
-  geom_segment(aes(x=3.8, xend=3.8, y=0.1, yend=0.85),colour="red")+
-  geom_segment(aes(x=4, xend=4, y=0.1, yend=0.85),colour="red")
+  geom_segment(aes(x=3.8, xend=3.8, y=0.4, yend=0.85),colour="red")+
+  geom_segment(aes(x=4, xend=4, y=0.4, yend=0.85),colour="red")
   #xlim(c(3.9,3.92))+
   #scale_color_discrete(high = "green", low="blue")
-  
+
+q=ggplot(results[which(results$n_result==1),], aes(x=period, y=theta, colour=factor(n_result)))+
+  geom_line()+
+  ggtitle(expression(paste("N",scriptscriptstyle(b),"=10","   N",scriptscriptstyle(c),"=10")))+
+  #  annotate("text", x=c(minim_period, 1.5*minim_period), y=c(0,0), label=c("Period", "Period and half"))+
+  ylab(expression(theta))+scale_color_discrete(h=c(180,270), guide=FALSE)+
+  geom_segment(aes(x=3.8, xend=4, y=0.4, yend=0.4),colour="red")+
+  geom_segment(aes(x=3.8, xend=4, y=0.85, yend=0.85),colour="red")+
+  geom_segment(aes(x=3.8, xend=3.8, y=0.4, yend=0.85),colour="red")+
+  geom_segment(aes(x=4, xend=4, y=0.4, yend=0.85),colour="red")
+
+r=ggplot(results[which(results$n_result==2),], aes(x=period, y=theta, colour=factor(n_result)))+
+  geom_line()+
+  #  annotate("text", x=c(minim_period, 1.5*minim_period), y=c(0,0), label=c("Period", "Period and half"))+
+  ylab(expression(theta))+scale_color_discrete(h=c(90,180), guide=FALSE)+
+  geom_segment(aes(x=3.8, xend=4, y=0.4, yend=0.4),colour="red")+
+  geom_segment(aes(x=3.8, xend=4, y=0.85, yend=0.85),colour="red")+
+  geom_segment(aes(x=3.8, xend=3.8, y=0.4, yend=0.85),colour="red")+
+  geom_segment(aes(x=4, xend=4, y=0.4, yend=0.85),colour="red")
+
+s=ggplot(results[which(results$n_result==3),], aes(x=period, y=theta, colour=factor(n_result)))+
+  geom_line()+
+  ggtitle(expression(paste("N",scriptscriptstyle(b),"=25","   N",scriptscriptstyle(c),"=2")))+
+  #  annotate("text", x=c(minim_period, 1.5*minim_period), y=c(0,0), label=c("Period", "Period and half"))+
+  ylab(expression(theta))+scale_color_discrete(h=c(90,180), guide=FALSE)+
+  geom_segment(aes(x=3.8, xend=4, y=0.3, yend=0.3),colour="red")+
+  geom_segment(aes(x=3.8, xend=4, y=0.85, yend=0.85),colour="red")+
+  geom_segment(aes(x=3.8, xend=3.8, y=0.3, yend=0.85),colour="red")+
+  geom_segment(aes(x=4, xend=4, y=0.3, yend=0.85),colour="red")
+
+t=ggplot(results[which(results$n_result==4),], aes(x=period, y=theta, colour=factor(n_result)))+
+  geom_line()+
+  ggtitle(expression(paste("N",scriptscriptstyle(b),"=50","   N",scriptscriptstyle(c),"=1")))+
+  #  annotate("text", x=c(minim_period, 1.5*minim_period), y=c(0,0), label=c("Period", "Period and half"))+
+  ylab(expression(theta))+scale_color_discrete(h=c(180,270), guide=FALSE)+
+  geom_segment(aes(x=3.8, xend=4, y=0.3, yend=0.3),colour="red")+
+  geom_segment(aes(x=3.8, xend=4, y=0.85, yend=0.85),colour="red")+
+  geom_segment(aes(x=3.8, xend=3.8, y=0.3, yend=0.85),colour="red")+
+  geom_segment(aes(x=4, xend=4, y=0.3, yend=0.85),colour="red")
+
+multiplot(plotlist = list(p,q,s,t), cols=2)
+
 #Plot Best Period
 ggplot(b_per, aes(x=100*time, y=data/mean(data), ymin=(data-error)/mean(data), ymax=(data+error)/mean(data)))+
   geom_point()+
