@@ -1,0 +1,264 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Plantilla pel Treball Fi de Grau
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[twocolumn]{revtex4}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx,epsfig}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{gensymb}
+\usepackage{float}
+
+\usepackage{fancyhdr}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\title{Periodic Emission of Gamma-Rays in Binary Stars}
+\author{Author: Juan Tornero Lucas}\\
+\affiliation{Facultat de F\'{\i}sica, Universitat de Barcelona, Diagonal
+645, 08028 Barcelona, Spain.}
+\author{Advisor: Josep Maria Paredes}
+\begin{abstract}
+\textbf{Abstract }In this paper we search for an orbital modulation of the VHE $\gamma$-ray flux in LS 5039, a High Mass X-ray Binary that consists in a compact object in an eccentric 3.9 day orbit around a massive star. For this purpose we use two different methods: Least-Squares Spectral Analysis (LSSA) or Lomb-Scargle test, which has been proved effective in this task previously, and Period Determination Using Phase Dispersion Minimization (PDM). We'll see that both methods verify this periodic modulation and that it matches the orbital period of the binary system.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+
+
+LS 5039 is one of the few confirmed galactic High Mass X-ray Binaries (HMXBs) with recurrent TeV emission, along with PSR B1259-63 or LSJ+61$\degree$303. 
+
+X-ray binaries are a class of binary stars that happen to be luminous in X-rays, which are produced by matter falling from the donor component -a star- to the accretor, a compact object -usually a neutron star or a black hole-. In particular, HMXBs have as a donnor a massive star, usually an O, B or a blue supergiant. In the case of LS 5039 the nature of the compact object is still unknown, nevertheless we have knowledge it companions a O6.5V star in a slightly eccentric ($e \approx $ 0.35) 3.90603 $\pm$ 0.00017 day orbit (Casares et al. 2005) \cite{casares}.
+
+For decades, the existance of $\gamma$-ray emitting binaries was speculated. The new generation of observatories allowed the discovery in the mid-2000's of HMXBs emitting high-energy (HE, 0.1-100 GeV) or very high-energy(VHE, $>$100 GeV) $\gamma$-rays \cite{dubus}. 
+
+Binary stars have a a specific property that distinguish them from any other object: their physical conditions vary on a regular timescale as the components revolve on their orbit. 
+
+In this paper we look for a modulation in the emission of VHE $\gamma$-rays in LS 5039 that matches the orbital period of this binary system. This modulation is the result of two phenomenons: between the apastron and the inferior conjunction, pairs of very energetic positrons and electrons induce by inverse Compton the increase of the energy in the $\gamma$-rays: $h \nu + e^- \rightarrow h \nu'$, with $h \nu' >> h \nu.$ Therefore is in this area where we detect the maximum in the VHE $\gamma$-ray flux. As a counterpart of this effect, around the superior conjunction, where the stellar wind is more intense, we have an absorption of photons that produce pairs of positrons and electrons $\gamma + \gamma \rightarrow e^+ + e^-$. Here is where we detect the minimun in the VHE $\gamma$-rays flux. So, though it may sound non-intuitive, when the compact object is closer to the star we detect minimums and when is further we find maximums. In Figure 6 we can appreciate this effect clearly. 
+
+\section{HESS data} 
+
+The observations were taken with HESS Aharonian et al.(2006b), an array of four identical Imaging Atmospheric Cherenkov Telescopes (IACT)  sensitive to $\gamma$-rays above 0.1 TeV. The total dataset comprises 160 runs (or pointings) representing 69.2 h observations from both 2004 and 2005 and comprehend flux energies above 1 TeV.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth, height=5.5cm]{C:/Users/Tornero/Documents/Uni/TFGFisica/theory_1.png}
+\caption{\textit{Scheme of LS-5039 system. In the periastron (phase $\phi = 0$) the compact object and the star are at minimum distance. Superior ($\phi = 0.058$) and inferior ($\phi = 0.716$) conjunctions phases correspond to the time of co-aligment along our line-of-sight of the compact object and stellar companion. The light blue cloud is a qualitative representation of the zones with intense stellar wind. The maximum of VHE $\gamma$ ray flux detection lag somewhat behind the apastron epoch, aligning better with the inferior conjunction; and the minimum flux occurs at $\phi \approx 0.2$, and bit further than superior conjunction, when the compact object aligns behind the star. to The orbit is actually inclined at an angle in the range $13 \degree < i <64 \degree$ with respect to the view above.}}
+\label{fig:sample}
+\end{figure}
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\columnwidth, height=6cm]{C:/Users/Tornero/Documents/Uni/TFGFisica/plot_1.png}
+\caption{\textit{Initial disposition of data points in the runwise VHE $\gamma$-ray flux at energies $>1$ TeV. Horizontal line represents the mean of the sample in order to appreciate the scattering around it of the data points.}}
+\label{fig:sample}
+\end{figure}
+
+\section{ Precedent Analysis}
+
+In this work we try to emulate the results obtained by Aharonian et al. (2006) \cite{aharonian}, where they managed to find a $3.9078 \pm 0.015$ days orbital period that was consistent with the $3.90603 \pm 0.00017$ days period from Casares et al. (2005).
+
+First, we have run a Lomb-Scargle Test, as they did at Aharonian et al.(2006) in order to replicate their result. Lomb-Scargle Test, or Least-Squares Spectral Analysis (LSSA) is a method to estimate a frequency spectrum through a least squares fit. This test assumes a sinusoidal behavior, what is supposed to be true in the case of an orbital modulation.
+
+Let it be $w$ our estimated period, then the flux variation would fit $\phi(t) = A \sin(wt) + B \cos(wt)$ for some constants $A$, $B$. Suppose we have the pair $O_i=(x_i, t_i), \quad \forall i \in \{1, \ldots, N\}$ of the energy $x_i$ at time $t_i$. Our set of data would be $\displaystyle O=\cup O_i$. LSSA first finds a time delay $\tau$ such that would make mutually orthogonal this pair of sinusoids in $\phi$ at any time $t_j$, and also reduce the effect of different powers in the basis of these functions. This makes LSSA equivalent to Lomb's least-squares method applied to $\phi$. The time delay $\tau$ is inferred from the formula
+\begin{center}
+$
+\tan (2 w \tau) = \frac{\sum\limits_{j=1}^{N} \sin (2 w t_j)}{\sum\limits_{j=1}^{N} \cos (2 w t_j)}
+$
+\end{center}
+
+Then the periodogram at frequency $w$ is estimated as:
+{\small
+$$
+P_O(w) =\frac{1}{2}\Bigg( \frac{\big[\sum\limits_{j=1}^{N} x_j \cos(w(t_j - \tau)) \big]^2}{\cos^2(w(t_j - \tau))} + \frac{\big[\sum\limits_{j=1}^{N} x_j \sin(w(t_j - \tau))\big]^2}{\sin^2(w(t_j - \tau))} \Bigg)
+$$
+}
+We use the LSSA implementation from RStudio package \textit{lomb} by Thomas Ruf \cite{lomb}, and perform it over our 160 data points set, obtaining the next periodogram.
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\columnwidth, height=6cm]{C:/Users/Tornero/Documents/Uni/TFGFisica/plot_2.png}
+\caption{\textit{Lomb-Scargle (LS) periodogram of the VHE runwise flux for LS 5039 (chance probability to obtain the LS power vs. frequency). The highest peak, with a p-value of $9.4889 \cdot 10^{-13}$ is around the frequence  0.25549 days$^{-1}$.}}
+\label{fig:sample}
+\end{figure}
+
+The result of our LS Test delivered a $3.914$ days orbital period, quiet consistent with the previous result of $3.9078 \pm 0.015$, considering at Aharonian et al. (2006) they made a calculation with a $p$-value of less than $10^{-15}$, while ours is around $10^{-12}$.
+
+\section{ Period Determination Using Phase Dispersion Minimization }
+
+Our alternative method to the LS Test, which force us to assume a sinusoidal behaviour, is the Period Determination Using Phase Dispersion Minimization (PDM) by Stellingwerf (1978).
+
+In this methodology we consider again $x$ our energy values at times $t$, therefore the $i$-th observation is given by $(x_i, t_i), i \in \{1, \ldots, N \}$, with $N=160$ in this case.
+
+Let $\sigma^2$ and $\mu$ be the variance and mean of $x$, respectively 
+
+$$
+\sigma^2=\dfrac{\sum\limits_{i=1}^{N}(x_i - \mu)}{N-1}  \quad \text{(1)}
+$$
+
+For any sample of $x$ we define $s^2$ exactly as $\sigma^2$ in (1). Suppose we have $M$ samples, having variances $s_j, j \in \{1, \ldots, M\}$. Each of these samples would contain $n_j$ data points and then, the overall variance for all samples is
+
+$$
+s^2 = \dfrac{\sum\limits_{j = 1}^{M}(n_j - 1)s_j^2}{\sum\limits_{k=1}^{M}n_j-1} \quad \text{(2)}
+$$
+
+Our objective is to minimize the variance of the data with respect mean light curve. Let $\alpha$ be our trial period, we define the phase vector $\phi$ as: $\displaystyle \phi_i = \frac{t_i}{\alpha}-[\frac{t_i}{\alpha}], i \in \{1, \ldots, N\}$. Where $[ \cdot ]$ means the integer part of the value.
+
+We'll pick our samples under the condition that all data points of a sample $j$ have similar $\phi_i$. The variance of these samples will give us a measure of the scatter around the mean light curve defined by the means of the $x_i$ in each sample, considered as a function of $\phi$. Our statistic value to evaluate the accuracy of the period $\alpha$ will be
+
+$$
+\Theta = \frac{s^2}{\sigma^2}, \quad \text{(3)}
+$$
+where $\sigma^2$ and $s^2$ are given by equations (1) and (2) respectively. If $\alpha$ is not the right period, then $s^2 \approx \sigma^2 \rightarrow \Theta \approx 1$. When  $\alpha$ is correct, $s^2$ reaches a minimum and $\Theta \approx 0$.
+
+We'll divide our phase space in $N_b$ intervals and take $N_c$ covers of these $N_b$ bins. Therefore we'll obtain $M=N_b N_c$ bins, each of length $\frac{1}{N_b}$ and whose midpoints will uniformly spaced at a distance of $\frac{1}{N_bN_c}$. We'll denote this bin structure by $(N_b, N_c)$.
+
+Next, we'll study the character of $\Theta$ near a minimum. In an oscillation of amplitude $A$, maximum variance in $x$ is $\sigma_0^2$ = $\frac{A^2}{12}$. We introduce a noise component $\sigma_N^2$, so the signal-to-noise ratio is $\epsilon=\frac{\sigma_0}{\sigma_N}$ and overall variance $\sigma^2 = \sigma_0^2 + \sigma_N^2$.
+
+Bin variance $s^2$ will have three components. The first one depends on the distance from line center ($\delta \phi$ or $\delta f$ in period and frequency, respectively). The second one is, as in $\sigma^2$, a noise contribution. The last contribution comes from a bin width variance. 
+
+If we take $g(\beta)$ as the mean light curve with dependency on the phase $\beta$, according to Stellingwerf (1978), the average pendent in a sinusoidal function as ours is $<g'> \approx 2 A = 2 \sqrt{12} \sigma_0 = 4 \sqrt{3} \sigma_0$. 
+
+Now let's figure out the variance due to a change in the trial period, which would induce a scatter in the phase over a range $\Delta \beta = 0 \rightarrow \frac{\Delta \phi}{\phi}\frac{T}{\phi}$, where $T=t_n - t_1$ is the time base. Therefore
+
+{\small
+$$
+s_\beta^2 = \frac{1}{12}\Bigg( \frac{T}{\phi}\frac{\Delta \phi}{\phi}\Bigg)^2 < g'>^2 = 4 \Bigg(\frac{T}{\phi}\frac{\Delta \phi}{\phi}\Bigg)^2\sigma_0^2=4 (T \Delta f)^2\sigma_0^2, \text{   } (4)
+$$
+}
+as $\frac{\Delta \phi}{\phi} = \frac{\Delta f}{f}$ for frequency $f=\phi^{-1}$.
+Finally, we'll have also a variation of $g$ across bins of width $N_b^{-1}$ in the form
+
+$$
+s_b^2=\frac{1}{12}\Bigg(\frac{g'}{N_b}\Bigg)^2 = 4\frac{\sigma_0^2}{N_b^2}. \quad (5)
+$$
+
+Then, the total bin variance is 
+
+$$
+s^2=s_{\beta}^2 + s_b^2 + \sigma_N^2 \quad (6)
+$$
+And we can develop the expression of $\Theta$ as 
+
+$$
+\Theta = \frac{s_{\beta}^2 + s_b^2 + \sigma_N^2}{\sigma_0^2 + \sigma_N^2} = \frac{1 + 4 \epsilon^2[N_b^{-1} + (T\Delta f)^2]}{1 + \epsilon^2}. \quad (7)
+$$
+
+We obtain from here that near a minimum the behaviour of the $\Theta$ statistic is parabolic. And looking at the $\Theta = 1$ level we can obtain the half-width 
+
+$$
+\Delta f_{1/2} = \frac{1}{T}\sqrt{\big(\frac{1}{4} - \frac{1}{N_b^2}\big)}. \quad (8)
+$$
+
+As all our simulations use $N_b \geq 5$, we can approximate $\Delta f_{1/2} = \frac{1}{2T}$. Also from here we can see that the half-width in terms of the period as $\Delta\phi_{1/2} \approx \frac{\phi^2}{2T}$. 
+
+An important feature of PDM technic is that finds all periodic components, subharmonics included -and also periodicity in the observations, what might produce false minimums-. Of course, in the subharmonics the mean light curve slope will be greater, according to Stellingwerf (1978) $<g'> = 2 n A$ for the $n$-th harmonic. So the half-width in the frequency for subharmonics will be $(\Delta f_n)_{1/2} = \frac{1}{2nT}$, this means we can distinguish subharmonics for their narrow line widths. Detecting subharmonics is fundamental at the time of assuring the reliability in the period found by PDM; if this period induces subharmonics it will be genuinely a periodic component and not just the product of 'noise' in the data.
+
+Additionally, the statistical  significance of the line will be given by the value of $\Theta$ at $\Delta f = 0$; if we substitute at equation (7) we'll have 
+
+$$
+\Theta = \frac{1 + 4\epsilon^2/N_b^2}{1+\epsilon^2} \quad (9)
+$$
+
+As the noise components in our data is large ($\epsilon < 1.25$), according to equation (9) the minimum will be above 0.49 (for $N_b = 5$). 
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\columnwidth, height=18cm]{C:/Users/Tornero/Documents/Uni/TFGFisica/prueba.png}
+\caption{\textit{Values of statistic $\Theta$ for different bin structures $(N_b, N_c)$. We search for the minims in a period range 0.5-15 days. In red we indicate the minimun $\Theta$ which belongs to the best fit for the period $\mathcal{P}$, and in yellow we have the first and second subharmonics, at approximately $2\mathcal{P}$ and $3\mathcal{P}$.}}
+\label{fig:sample}
+\end{figure}
+
+
+\section{Results}
+
+We have run various simulations with different $(N_b, N_c)$ distributions, changing the period in 0.001 each time, and looking in a range 0.5-15 days, as we can see in Figure 4.
+
+For $N_b > 10$ the periodogram begins to be messy, with a lot of noise due to the lack of enough data. This is because the number of data points is $N=160$, then for $N_b \geq 10$ the average amount of points in each bin will be $n_b = 16$, and therefore the number of freedom degrees is barely enough to maintain statistically consistency. Remark that despite this fact, statistics $\Theta$ minims are still found at the right orbital period, along with its subharmonics.
+
+In Table I we show in detail the results of our tests for $5 \leq N_b \leq 10$. We can observe that all values, except $(5,5)$, belong to the interval $3.9063 \pm 0.0017$ days of the estimated orbital period, being spot on in the cases $(8,6)$ and $(10,2)$ with $3.906$ days both of them. Furthermore, of all these results, $(10,2)$ happens to have the smallest $\Theta$ value, what makes it the most statistically reliable value. We'll use this period $\mathcal{P}=3.906$ days from $(10,2)$ as our best period fit.
+
+
+\begin{table}[t]
+\centering
+\begin{tabular}{cccc}
+  \hline
+$N_b$ & $N_c$ & Period Stimation & $\Theta$ \\ 
+  \hline
+5 & 2 & 3.908 & 0.5653 \\ 
+  5 & 4 & 3.908 & 0.5837 \\ 
+  5 & 5 & 3.912 & 0.5786 \\ 
+  6 & 3 & 3.908 & 0.5636 \\ 
+  6 & 4 & 3.908 & 0.5666 \\ 
+  8 & 4 & 3.908 & 0.5372 \\ 
+  8 & 6 & 3.906 & 0.5395 \\ 
+  10 & 2 & 3.906 & 0.5134 \\ 
+  10 & 5 & 3.907 & 0.5209 \\ 
+   \hline
+	\end{tabular}
+\caption{\textit{Results of our PMD tests combining different $(N_b, N_c)$ configurations, and being $5 \leq N_b \leq 10$. More statistically relevant value (minimum $\Theta$) found at $(10,2)$ with a period 3.906 days; which is the exact value of the orbital period in LS 5039.}} 
+\end{table}
+
+For the case $(10,2)$ we also represent the $\Theta$ vs. frequency graphic in Figure 5, where we can observe clearly the minimum in $\Theta$ at the frequency 0.256 days$^{-1}$ -inverse of period $\mathcal{P} = 3.906$ days-. We also highlight the first two subharmonics, which have the second and third minimum value of $\Theta$. Plus, in Figure 6 we see in detail the behavior of $\Theta$ around the minims in order to confirm the parabolic behavior predicted in Section IV.
+
+\begin{figure}[t]
+\centering 
+\includegraphics[width=\columnwidth, height=6cm]{C:/Users/Tornero/Documents/Uni/TFGFisica/plot_04.png}
+\caption{\textit{a) Frequency of the minimum at 0.256 days$^{-1}$, corresponding to $\mathcal{P}^{-1}$. b) First harmonic is found at  0.128 days$^{-1}$, whose inverse is 7.8125 days $\approx 2\mathcal{P}$. c) Second harmonic belongs to 0.0853 days$^{-1}$ or 11.716 days $\approx 3\mathcal{P}$ days.}} 
+\label{fig:sample}
+\end{figure}
+
+
+Finally, in Fig. 7 we see the representation in phase of the data points set for the period 3.906 inferred by PDM for the case $(10,2)$. In the graphic we can detect, despite the big error bars, that the points follows an almost sinusoidal distribution, as we expect in a periodic modulation due to orbital period.   
+
+\section{Conclusion}
+The goal of this paper was to confirm the orbital modulation in the VHE $\gamma$-ray flux of LS 5039 first detected at Aharonian et al. (2006). We've been able to replicate their results through our own Lomb-Scargle periodogram, and we've also achieved these same results using a different method -PDM by Stellingwerf (1978)-. 
+All this makes us affirm that LS 5039 is the first binary system with periodic emission of VHE $\gamma$-rays flux associated to its orbital period. Also, we've seen that PDM method can be a powerful tool to study emission periodicity in other systems suspicious to have the same properties as LS 5039.
+
+\newpage
+
+\begin{figure}[t]
+\centering 
+\includegraphics[width=\columnwidth, height=4cm]{C:/Users/Tornero/Documents/Uni/TFGFisica/paraboles.png}
+\caption{\textit{The representation of $\Theta$ behaviour around the minimums show the parabolic behavior predicted in Section IV. a) Representation of $\mathcal{P}^{-1}$ minimum, which have an amplitude of 0.004 days$^{-1}$, the widest of them all b) $\Theta$ minimum around the first subharmonic at $(2\mathcal{P})^{-1}$ c) Second subharmonic minimun at $(3\mathcal{P})^{-1}$, it has a width similar to the first subharmonic due to a sub-minimum. For all these graphics a quadratic regression based on a t-test with a 95\% confidence band is performed. This test is performed by ggplot package of RStudio \cite{ggplot}.}}
+\label{fig:sample}
+\end{figure}
+
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth, height=6cm]{C:/Users/Tornero/Documents/Uni/TFGFisica/plot_03.png}
+\caption{\textit{Phase distribution of data points for orbital period 3.906; we extended it for better appreciation of the periodicity in the $\gamma$ ray's flux. A sinusoidal regression based on a t-test with a 95\% confidence band is performed. This test is performed by ggplot package of RStudio. We see how around the superior conjunction ($\phi =0.058$) we detect a minimum in the flux, and between the apastron and the inferior conjunction ($\phi = 0.716$) the flux reaches its maximum, as we explained in the introduction.}}
+\label{fig:sample}
+\end{figure}  
+
+
+
+
+
+\begin{thebibliography}{99}
+
+\bibitem{casares} New Optical Results on $\gamma$-ray Binaries. J. Casares, J.M. Corral-Santana, A. Herrero et al. 2005.  arXiv:1012.4351
+\bibitem{aharonian} 3.9 day orbital modulation in the TeV }$\gamma$-ray flux and spectrum from the X-ray binary LS 5039. F. Aharonian, A.G. Akhperjanian, A. R. Bazer-Bachi, et al. 2006, A\&A 460 743-749.
+\bibitem{dubus} Gamma-ray binaries and related systems.  Guillaume Dubus 2013. Astronomy and Astrophysics Review, 21, 64.
+\bibitem{lomb} Lomb-Scargle Periodogram R-Package. Thomas Ruf, released in 2013. https://cran.r-project.org/web/packages/lomb.
+\bibitem{ggplot} Package ‘ggplot2’. Hadley Wickham, Winston Chang v. 2.2.1  released in December 30, 2016. https://cran.r-project.org/web/packages/ggplot2/ggplot2.pdf
+
+\end{thebibliography}
+
+
+
+
+
+
+\end{document}
